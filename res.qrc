@@ -4,8 +4,6 @@
         <file>for_intro/neutral.jpg</file>
         <file>for_intro/smile.jpg</file>
         <file>for_intro/surprise.jpg</file>
-    </qresource>
-    <qresource prefix="/">
         <file>for_intro/angry.jpg</file>
     </qresource>
 </RCC>
