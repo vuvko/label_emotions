@@ -10,12 +10,10 @@ MainWindow::MainWindow(QWidget *parent) :
     labels << "Неразборчиво" << "Нейтральное" << "Радость" << "Страх" << "Удивление"
            << "Грусть" << "Отвращение" << "Злость";
     labelsM.setStringList(labels);
-//    ui->LabelBox->addItems(labels);
     ui->LabelView->setModel(&labelsM);
     QStringList types;
     types << "Слабо выражено" << "Заметно выражено" << "Ярко выражено";
     typesM.setStringList(types);
-//    ui->TypeBox->addItems(types);
     ui->TypeView->setModel(&typesM);
     imageFolder = "images";
     resultsFile = "current_results.yml";
@@ -59,8 +57,6 @@ MainWindow::save(void)
     if (currentImage.isEmpty()) {
         return;
     }
-//    int currentLabel = ui->LabelBox->currentIndex();
-//    int currentType = ui->TypeBox->currentIndex();
     int currentLabel = ui->LabelView->currentIndex().row();
     int currentType = ui->TypeView->currentIndex().row();
     QFile results(resultsFile);
@@ -116,8 +112,6 @@ MainWindow::updateImage(void)
     } else {
         currentImage = images.first().filePath();
         ui->Canvas->setPixmap(QPixmap(currentImage));
-//        ui->LabelBox->setCurrentIndex(0);
-//        ui->TypeBox->setCurrentIndex(0);
         auto sel = labelsM.index(0);
         ui->LabelView->setCurrentIndex(sel);
         sel = typesM.index(0);
@@ -160,6 +154,12 @@ MainWindow::showInstructions(void)
             "может быть перекрытым. В случае затруднения определения эмоции "
             "следует выбрать вариант \"Неразборчиво\" из верхнего выпадающего "
             "списка."
+            "</p>"
+            "<p>"
+            "В случае нескольких неперекрывающих друг друга лиц, основным "
+            "(по которому выбирается эмоция) считается центральное лицо. "
+            "В случае затруднения определения, следует выбрать вариант "
+            "\"Неразборчиво\"."
             "</p>"
             ;
     QMessageBox instructions;
