@@ -23,6 +23,28 @@
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" rowspan="2">
+       <widget class="QLabel" name="Canvas">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Больше нет изображений</string>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="1">
        <widget class="QListView" name="LabelView">
         <property name="sizePolicy">
@@ -46,44 +68,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="0" rowspan="2">
-       <widget class="QLabel" name="Canvas">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Больше нет изображений</string>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QListView" name="TypeView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="defaultDropAction">
-         <enum>Qt::IgnoreAction</enum>
-        </property>
-       </widget>
-      </item>
       <item row="3" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -103,6 +87,13 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="PrevButton">
+          <property name="text">
+           <string>Предыдущая</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QPushButton" name="NextButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -116,6 +107,22 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item row="1" column="1">
+       <widget class="QListView" name="TypeView">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="defaultDropAction">
+         <enum>Qt::IgnoreAction</enum>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -151,8 +158,8 @@
    <slot>nextImage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>396</x>
-     <y>304</y>
+     <x>630</x>
+     <y>440</y>
     </hint>
     <hint type="destinationlabel">
      <x>124</x>
@@ -176,11 +183,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>PrevButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>prevImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>508</x>
+     <y>427</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>320</x>
+     <y>292</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>nextImage()</slot>
   <slot>showInstructions()</slot>
   <slot>save()</slot>
   <slot>load()</slot>
+  <slot>prevImage()</slot>
  </slots>
 </ui>

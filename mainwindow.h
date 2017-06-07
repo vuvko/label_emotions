@@ -25,6 +25,7 @@ public:
 
 public slots:
     void nextImage(void);
+    void prevImage(void);
     void showInstructions(void);
     void save(void);
     void load(void);
@@ -35,16 +36,19 @@ private:
     QString resultsFile;
     QString currentImage;
     size_t current_idx;
+    QHash<QFileInfo, QVector<int>>::iterator current_it;
     size_t num_images;
-    QFileInfoList images;
+    QHash<QFileInfo, QVector<int>> images;
 
     QStringListModel labelsM;
     QStringListModel typesM;
 
     bool show_intro;
 
-    void parseLine(const QString &line);
+    QPair<QString, QVector<int>> parseLine(const QString &line);
     void updateImage(void);
 };
+
+uint qHash(const QFileInfo &key, uint seed=0);
 
 #endif // MAINWINDOW_H
