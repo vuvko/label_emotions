@@ -41,7 +41,6 @@ MainWindow::nextImage(void)
     if (images.isEmpty()) {
         return;
     }
-//    images.removeFirst();
     current_idx += 1;
     ++current_it;
     updateImage();
@@ -113,11 +112,13 @@ MainWindow::load(void)
         auto res = parseLine(line);
         if (res.first != "") {
             images[QFileInfo(res.first)] = res.second;
-            current_idx += 1;
         }
     }
     results.close();
-    current_it += current_idx;
+    while((current_it != images.end()) && (current_it.value()[0] >= 0)) {
+        ++current_it;
+        ++current_idx;
+    }
     updateImage();
 }
 
@@ -128,12 +129,8 @@ MainWindow::parseLine(const QString &line)
     QPair<QString, QVector<int>> ret("", QVector<int>(2));
     if (splitExpr.indexIn(line) >= 0) {
         ret.first = splitExpr.cap(1);
-//        images.removeOne(QFileInfo(img_name));
-//        QVector<int> cur_label(2, 0);
         ret.second[0] = splitExpr.cap(2).toInt();
         ret.second[1] = splitExpr.cap(3).toInt();
-//        images[QFileInfo(img_name)] = cur_label;
-//        current_idx += 1;
     }
     return ret;
 }
@@ -142,7 +139,6 @@ void
 MainWindow::updateImage(void)
 {
     ui->MarkedLabel->setText(QString("Размечено: %1/%2").arg(current_idx).arg(num_images));
-//    ++current_it;
     if (current_it == images.begin()) {
         ui->PrevButton->setEnabled(false);
     } else {
@@ -152,7 +148,6 @@ MainWindow::updateImage(void)
         ui->Canvas->setText("Больше нет изображений");
         ui->NextButton->setEnabled(false);
     } else {
-//        currentImage = images.first().filePath();
         currentImage = current_it.key().filePath();
         for (int i = 0; i < current_it.value().length(); ++i) {
             if (current_it.value()[i] < 0) {
