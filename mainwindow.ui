@@ -23,6 +23,13 @@
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="6" column="0">
+       <widget class="QLabel" name="MarkedLabel">
+        <property name="text">
+         <string>Размечено: 0/0</string>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0" rowspan="2">
        <widget class="QLabel" name="Canvas">
         <property name="sizePolicy">
@@ -45,7 +52,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="0" column="2">
        <widget class="QListView" name="LabelView">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
@@ -61,22 +68,38 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="MarkedLabel">
-        <property name="text">
-         <string>Размечено: 0/0</string>
+      <item row="1" column="2">
+       <widget class="QListView" name="TypeView">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
+        <property name="defaultDropAction">
+         <enum>Qt::IgnoreAction</enum>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout">
+      <item row="3" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <spacer name="horizontalSpacer">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Текущий номер изображения</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="imageIndexBox"/>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -86,6 +109,10 @@
           </property>
          </spacer>
         </item>
+       </layout>
+      </item>
+      <item row="4" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
         <item>
          <widget class="QPushButton" name="PrevButton">
           <property name="text">
@@ -106,23 +133,74 @@
           </property>
          </widget>
         </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </item>
-      <item row="1" column="1">
-       <widget class="QListView" name="TypeView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
-        </property>
-        <property name="defaultDropAction">
-         <enum>Qt::IgnoreAction</enum>
-        </property>
-       </widget>
+      <item row="5" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="nextUnlabeledButton">
+          <property name="text">
+           <string>Следующая неразмеченная</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="2" rowspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="checkButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Принять разметку</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
@@ -141,10 +219,22 @@
    </attribute>
    <addaction name="instructionsAction"/>
    <addaction name="separator"/>
+   <addaction name="loadAction"/>
   </widget>
   <action name="instructionsAction">
    <property name="text">
     <string>Инструкции</string>
+   </property>
+  </action>
+  <action name="loadAction">
+   <property name="text">
+    <string>Загрузить</string>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Выбрать директорию, содержащую изображения для разметки.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>
@@ -158,8 +248,8 @@
    <slot>nextImage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>630</x>
-     <y>440</y>
+     <x>199</x>
+     <y>387</y>
     </hint>
     <hint type="destinationlabel">
      <x>124</x>
@@ -190,12 +280,76 @@
    <slot>prevImage()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>508</x>
-     <y>427</y>
+     <x>106</x>
+     <y>387</y>
     </hint>
     <hint type="destinationlabel">
      <x>320</x>
      <y>292</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>loadAction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>load()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>320</x>
+     <y>236</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>nextUnlabeledButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>nextUnlabeledImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>207</x>
+     <y>418</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>388</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>imageIndexBox</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>gotoImage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>265</x>
+     <y>356</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>11</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>checkLabel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>565</x>
+     <y>362</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>295</x>
+     <y>445</y>
     </hint>
    </hints>
   </connection>
@@ -206,5 +360,8 @@
   <slot>save()</slot>
   <slot>load()</slot>
   <slot>prevImage()</slot>
+  <slot>nextUnlabeledImage()</slot>
+  <slot>gotoImage()</slot>
+  <slot>checkLabel()</slot>
  </slots>
 </ui>

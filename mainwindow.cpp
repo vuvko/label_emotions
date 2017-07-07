@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     typesM.setStringList(types);
     ui->TypeView->setModel(&typesM);
     imageFolder = "images";
-    resultsFile = "current_results.yml";
+    resultsFile = "images_results.yml";
     show_intro = false;
     current_idx = 0;
     if (!QFileInfo(resultsFile).exists()) {
@@ -35,14 +35,56 @@ MainWindow::~MainWindow()
 }
 
 void
-MainWindow::nextImage(void)
+MainWindow::checkLabel(void)
 {
-    save();
+    if (current_it != images.end()) {
+        if (current_it.value()[0] == 0) {
+            ++current_idx;
+        }
+        save();
+    }
+    nextImage();
+}
+
+void
+MainWindow::gotoImage(void)
+{
     if (images.isEmpty()) {
         return;
     }
-    current_idx += 1;
-    ++current_it;
+    int image_idx = ui->imageIndexBox->value();
+    if (image_idx >= images.size()) {
+        image_idx = images.size() - 1;
+    }
+    current_it = images.begin() + image_idx;
+    updateImage();
+}
+
+void
+MainWindow::nextUnlabeledImage(void)
+{
+    if (images.isEmpty()) {
+        return;
+    }
+    int image_idx = 1;
+    for (current_it = images.begin();
+         current_it != images.end();
+         ++current_it, ++image_idx) {
+        if (current_it.value()[0] == 0) {
+            break;
+        }
+    }
+    ui->imageIndexBox->setValue(image_idx);
+    updateImage();
+}
+
+void
+MainWindow::nextImage(void)
+{
+    if (images.isEmpty()) {
+        return;
+    }
+    incImage();
     updateImage();
 }
 
@@ -52,8 +94,13 @@ MainWindow::prevImage(void)
     if (current_it == images.begin()) {
         ui->PrevButton->setEnabled(false);
     }
-    current_idx -= 1;
-    --current_it;
+    if (current_it != images.end()) {
+        save();
+        if (current_it.value()[0] == 0) {
+            ++current_idx;
+        }
+    }
+    decImage();
     updateImage();
 }
 
@@ -71,18 +118,22 @@ MainWindow::save(void)
     }
     int currentLabel = ui->LabelView->currentIndex().row();
     int currentType = ui->TypeView->currentIndex().row();
-    QVector<int> label(2);
-    label[0] = currentLabel;
-    label[1] = currentType;
+    QVector<int> label(3);
+    label[0] = 1;
+    label[1] = currentLabel;
+    label[2] = currentType;
+    if (label == current_it.value()) {
+        return;
+    }
     *current_it = label;
     QFile results(resultsFile);
     results.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream resultsStream(&results);
     resultsStream << "# Automatically generated file, do not modify it!" << endl;
     for (auto el = images.begin(); el != images.end(); ++el) {
-        if ((el.value()[0] >= 0) && (el.value()[1] >= 0)) {
-            resultsStream << " - " << el.key().filePath() << ": [" << el.value()[0] << ", " <<
-                             el.value()[1] << "]" << endl;
+        if (el.value()[0]) {
+            resultsStream << " - " << el.key() << ": [" << el.value()[1] << ", " <<
+                             el.value()[2] << "]" << endl;
         }
     }
     results.close();
@@ -91,12 +142,33 @@ MainWindow::save(void)
 void
 MainWindow::load(void)
 {
-    QDir imagesDir(imageFolder);
-    for (auto img_file : imagesDir.entryInfoList(QDir::Files | QDir::Readable)) {
-        images.insert(img_file, QVector<int>(2, -1));
+    QString newImageFolder = QFileDialog::getExistingDirectory(this, tr("Выбрать директорию"),
+                                                    imageFolder,
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (newImageFolder.isEmpty() || newImageFolder == "") {
+        return;
+    }
+    imageFolder = newImageFolder;
+    QStringList path_parts = imageFolder.split(QDir::separator(), QString::SkipEmptyParts);
+    resultsFile = path_parts[path_parts.length() - 1] + QString("_results.yml");
+    loadFiles();
+}
+
+void
+MainWindow::loadFiles(void)
+{
+    current_idx = 0;
+    images.clear();
+    QDirIterator dirIt(imageFolder, QDirIterator::Subdirectories);
+    while(dirIt.hasNext()) {
+        dirIt.next();
+        if (QFileInfo(dirIt.filePath()).isFile()) {
+            images.insert(dirIt.filePath(), QVector<int>(3, 0));
+        }
     }
     current_it = images.begin();
     num_images = images.size();
+    ui->imageIndexBox->setMaximum(num_images);
     QFile results(resultsFile);
     results.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream resultsStream(&results);
@@ -111,14 +183,20 @@ MainWindow::load(void)
         }
         auto res = parseLine(line);
         if (res.first != "") {
-            images[QFileInfo(res.first)] = res.second;
+            QVector<int> label(3, 1);
+            label[1] = res.second[0];
+            label[2] = res.second[1];
+            images[res.first] = label;
+            ++current_idx;
         }
     }
     results.close();
-    while((current_it != images.end()) && (current_it.value()[0] >= 0)) {
+    int image_idx = 1;
+    while((current_it != images.end()) && (current_it.value()[0] >= 1)) {
         ++current_it;
-        ++current_idx;
+        ++image_idx;
     }
+    ui->imageIndexBox->setValue(image_idx);
     updateImage();
 }
 
@@ -148,19 +226,30 @@ MainWindow::updateImage(void)
         ui->Canvas->setText("Больше нет изображений");
         ui->NextButton->setEnabled(false);
     } else {
-        currentImage = current_it.key().filePath();
-        for (int i = 0; i < current_it.value().length(); ++i) {
-            if (current_it.value()[i] < 0) {
-                (*current_it)[i] = 0;
-            }
-        }
+        currentImage = current_it.key();
         ui->Canvas->setPixmap(QPixmap(currentImage));
-        auto sel = labelsM.index(current_it.value()[0]);
+        auto sel = labelsM.index(current_it.value()[1]);
         ui->LabelView->setCurrentIndex(sel);
-        sel = typesM.index(current_it.value()[1]);
+        sel = typesM.index(current_it.value()[2]);
         ui->TypeView->setCurrentIndex(sel);
         ui->NextButton->setEnabled(true);
     }
+}
+
+void
+MainWindow::incImage(void)
+{
+    ++current_it;
+    int image_idx = ui->imageIndexBox->value();
+    ui->imageIndexBox->setValue(image_idx + 1);
+}
+
+void
+MainWindow::decImage(void)
+{
+    --current_it;
+    int image_idx = ui->imageIndexBox->value();
+    ui->imageIndexBox->setValue(image_idx - 1);
 }
 
 void
@@ -211,10 +300,4 @@ MainWindow::showInstructions(void)
     instructions.setInformativeText(text);
     instructions.exec();
     show_intro = false;
-}
-
-uint
-qHash(const QFileInfo &key, uint seed)
-{
-    return qHash(key.filePath(), seed);
 }
