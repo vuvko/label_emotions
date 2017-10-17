@@ -130,6 +130,7 @@ MainWindow::save(void)
     results.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream resultsStream(&results);
     resultsStream << "# Automatically generated file, do not modify it!" << endl;
+    resultsStream << "# " << imageFolder << endl;
     for (auto el = images.begin(); el != images.end(); ++el) {
         if (el.value()[0]) {
             resultsStream << " - " << el.key() << ": [" << el.value()[1] << ", " <<
@@ -155,21 +156,37 @@ MainWindow::load(void)
 }
 
 void
+MainWindow::loadLabels(void)
+{
+    QString newResultsFile = QFileDialog::getOpenFileName(this, tr("Выбрать файл разметки"),
+                                                          imageFolder, "*.yml");
+    if (newResultsFile.isEmpty() || newResultsFile == "") {
+        return;
+    }
+    resultsFile = newResultsFile;
+    loadFiles();
+}
+
+void
 MainWindow::loadFiles(void)
 {
     current_idx = 0;
     images.clear();
+    QDir imageDir(imageFolder);
+//    imageDir.cdUp();
     QDirIterator dirIt(imageFolder, QDirIterator::Subdirectories);
     while(dirIt.hasNext()) {
         dirIt.next();
         if (QFileInfo(dirIt.filePath()).isFile()) {
-            images.insert(dirIt.filePath(), QVector<int>(3, 0));
+            images.insert(imageDir.relativeFilePath(dirIt.filePath()), QVector<int>(3, 0));
         }
     }
-    current_it = images.begin();
     num_images = images.size();
     ui->imageIndexBox->setMaximum(num_images);
     QFile results(resultsFile);
+    if (!results.exists()) {
+        std::cerr << "No labeling results, creating new one" << std::endl;
+    }
     results.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream resultsStream(&results);
     while (!resultsStream.atEnd()) {
@@ -184,6 +201,7 @@ MainWindow::loadFiles(void)
         auto res = parseLine(line);
         if (res.first != "") {
             QVector<int> label(3, 1);
+            label[0] = 1;
             label[1] = res.second[0];
             label[2] = res.second[1];
             images[res.first] = label;
@@ -192,6 +210,7 @@ MainWindow::loadFiles(void)
     }
     results.close();
     int image_idx = 1;
+    current_it = images.begin();
     while((current_it != images.end()) && (current_it.value()[0] >= 1)) {
         ++current_it;
         ++image_idx;
@@ -226,7 +245,10 @@ MainWindow::updateImage(void)
         ui->Canvas->setText("Больше нет изображений");
         ui->NextButton->setEnabled(false);
     } else {
-        currentImage = current_it.key();
+//        QDir imageDir(imageFolder);
+//        imageDir.cdUp();
+//        currentImage = imageDir.path() + QDir::separator() + current_it.key();
+        currentImage = imageFolder + QDir::separator() + current_it.key();
         ui->Canvas->setPixmap(QPixmap(currentImage));
         auto sel = labelsM.index(current_it.value()[1]);
         ui->LabelView->setCurrentIndex(sel);
@@ -264,7 +286,12 @@ MainWindow::showInstructions(void)
             "следует выбрать сначала эмоцию, которая соответствует "
             "отображаемому лицу, затем выбрать степень выраженности "
             "эмоции. По окончанию выбора следует нажать на кнопку "
-            "\"Следующая\", находяющуюся в нижнем правом углу интерфейса."
+            "\"Принять разметку\", находяющуюся в нижнем правом углу интерфейса."
+            "</p>"
+            "<p>"
+            "Для исправления разметки следует выбрать нужное изображение "
+            "с помощью навигации в нижнем левом углу формы, и после "
+            "исправления вновь нажать кнопку \"Принять разметку\"."
             "</p>"
             "<h2>Примеры</h2>"
             "<p>"

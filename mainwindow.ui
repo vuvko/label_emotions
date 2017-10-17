@@ -220,6 +220,7 @@
    <addaction name="instructionsAction"/>
    <addaction name="separator"/>
    <addaction name="loadAction"/>
+   <addaction name="loadLabelAction"/>
   </widget>
   <action name="instructionsAction">
    <property name="text">
@@ -228,13 +229,21 @@
   </action>
   <action name="loadAction">
    <property name="text">
-    <string>Загрузить</string>
+    <string>Загрузить изображения</string>
    </property>
    <property name="toolTip">
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Выбрать директорию, содержащую изображения для разметки.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="loadLabelAction">
+   <property name="text">
+    <string>Загрузить разметку</string>
+   </property>
+   <property name="toolTip">
+    <string>Выбрать файл с полной или частичной разметкой выбранных изображений</string>
    </property>
   </action>
  </widget>
@@ -353,6 +362,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>loadLabelAction</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>loadLabels()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>320</x>
+     <y>236</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>nextImage()</slot>
@@ -363,5 +388,6 @@
   <slot>nextUnlabeledImage()</slot>
   <slot>gotoImage()</slot>
   <slot>checkLabel()</slot>
+  <slot>loadLabels()</slot>
  </slots>
 </ui>

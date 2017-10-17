@@ -12,6 +12,7 @@
 #include <QFileDialog>
 
 #include <algorithm>
+#include <iostream>
 
 #include <QDebug>
 
@@ -39,6 +40,7 @@ public slots:
     void showInstructions(void);
     void save(void);
     void load(void);
+    void loadLabels(void);
 
 private:
     Ui::MainWindow *ui;
